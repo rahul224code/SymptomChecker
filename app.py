@@ -1,104 +1,75 @@
 import streamlit as st
 import pandas as pd
 from PIL import Image
+from googletrans import Translator
 
 # Load logo
 logo = Image.open("logo.png")
 
 # Load data
 @st.cache_data
-
 def load_data():
-    return pd.read_csv("symptom_disease_suggestions_extended_v2.csv")
+    return pd.read_csv("symptom_disease_multilingual_30symptoms.csv")
 
-# Language dictionary
-translations = {
-    "English": {
-        "enter_symptoms": "Enter your symptoms (comma-separated or select from below):",
-        "select_symptoms": "Or select symptoms:",
-        "check": "Check Suggestions",
-        "possible_disease": "Possible Disease:",
-        "medications": "OTC Medications:",
-        "advice": "Advice:",
-        "no_match": "No matching condition found. Please try again with different symptoms.",
-        "disclaimer": "Disclaimer: This tool is for informational purposes only and not a substitute for professional medical advice. Always consult a licensed healthcare provider."
-    },
-    "Hindi": {
-        "enter_symptoms": "अपने लक्षण दर्ज करें (कॉमा से अलग करें या नीचे से चुनें):",
-        "select_symptoms": "या लक्षण चुनें:",
-        "check": "सुझाव देखें",
-        "possible_disease": "संभावित बीमारी:",
-        "medications": "ओटीसी दवाएं:",
-        "advice": "सलाह:",
-        "no_match": "कोई मेल नहीं मिला। कृपया अलग लक्षणों के साथ पुनः प्रयास करें।",
-        "disclaimer": "अस्वीकरण: यह उपकरण केवल सूचना के उद्देश्य से है और पेशेवर चिकित्सा सलाह का विकल्प नहीं है। हमेशा एक लाइसेंस प्राप्त स्वास्थ्य प्रदाता से परामर्श लें।"
-    },
-    "Bengali": {
-        "enter_symptoms": "আপনার উপসর্গ লিখুন (কমা দিয়ে আলাদা করুন বা নিচে থেকে বেছে নিন):",
-        "select_symptoms": "অথবা উপসর্গ বেছে নিন:",
-        "check": "সুজ্ঞা দেখুন",
-        "possible_disease": "সম্ভাব্য রোগ:",
-        "medications": "ওটিসি ওষুধ:",
-        "advice": "পরামর্শ:",
-        "no_match": "মিল পাওয়া যায়নি। দয়া করে অন্য উপসর্গ দিয়ে চেষ্টা করুন।",
-        "disclaimer": "দায়ত্যাগ: এই টুলটি শুধুমাত্র তথ্যের উদ্দেশ্যে এবং পেশাদার চিকিৎসা পরামর্শের বিকল্প নয়। সর্বদা একজন লাইসেন্সপ্রাপ্ত স্বাস্থ্যসেবা প্রদানকারীর পরামর্শ নিন।"
-    }
-}
+# Translator setup
+translator = Translator()
+
+def translate(text, dest):
+    try:
+        return translator.translate(text, dest=dest).text
+    except:
+        return text
 
 # UI config
 st.set_page_config(page_title="SymptomChecker - AI-Based OTC Suggestion App", page_icon="⚕", layout="centered")
-st.image(logo, width=120)
+st.image(logo, width=100)
 st.title("SymptomChecker")
 st.caption("An AI-powered multilingual tool for safe OTC medicine suggestions")
 
 # Language selector
 lang = st.selectbox("Choose Language", ["English", "Hindi", "Bengali"])
+lang_code = {"English": "English", "Hindi": "Hindi", "Bengali": "Bengali"}[lang]
 
 # Load data
 data = load_data()
 
-# Extract unique symptoms for multi-select
-unique_symptoms = set()
-for s in data["Symptoms"]:
-    unique_symptoms.update([i.strip().capitalize() for i in s.split(";")])
-sorted_symptoms = sorted(unique_symptoms)
+# Extract all symptoms in selected language
+symptom_col = f"Symptoms ({lang_code})"
+all_symptoms = set()
+for symptoms in data[symptom_col]:
+    all_symptoms.update([s.strip() for s in symptoms.split(";")])
 
-# Input method
-st.markdown(f"**{translations[lang]['enter_symptoms']}**")
-text_input = st.text_input("", placeholder="e.g., Fever, Headache")
-selected_symptoms = st.multiselect(translations[lang]['select_symptoms'], sorted_symptoms)
+# Show multiselect options and custom input
+selected_symptoms = st.multiselect(f"Select symptoms ({lang}):", sorted(all_symptoms))
+custom_input = st.text_input("Or type your symptoms (comma-separated):")
 
-# Combine inputs
-def get_combined_symptoms():
-    combined = []
-    if text_input:
-        combined += [s.strip().lower() for s in text_input.split(",") if s.strip()]
-    if selected_symptoms:
-        combined += [s.strip().lower() for s in selected_symptoms if s.strip()]
-    return list(set(combined))
+# Merge selections
+final_symptoms = set(selected_symptoms)
+if custom_input:
+    final_symptoms.update([s.strip() for s in custom_input.split(",")])
 
 # Match logic
-def match_symptoms(user_symptoms, data):
+def match_symptoms(user_symptoms, df, lang_code):
     results = []
-    for _, row in data.iterrows():
-        known_symptoms = [s.strip().lower() for s in row["Symptoms"].split(";")]
-        if any(symptom in known_symptoms for symptom in user_symptoms):
+    for _, row in df.iterrows():
+        known_symptoms = [s.strip().lower() for s in row[f"Symptoms ({lang_code})"].split(";")]
+        if any(symptom.lower() in known_symptoms for symptom in user_symptoms):
             results.append(row)
     return pd.DataFrame(results)
 
-if st.button(translations[lang]["check"]):
-    symptoms_list = get_combined_symptoms()
-    result_df = match_symptoms(symptoms_list, data)
+# Show results
+if st.button("Check Suggestions"):
+    result_df = match_symptoms(final_symptoms, data, lang_code)
 
     if not result_df.empty:
         for _, row in result_df.iterrows():
-            st.subheader(f"{translations[lang]['possible_disease']} {row[f'Possible Disease ({lang})']}")
-            st.write(f"**{translations[lang]['medications']}** {row[f'OTC Medications ({lang})']}")
-            st.write(f"**{translations[lang]['advice']}** {row[f'Advice ({lang})']}")
+            st.subheader(f"Possible Disease: {row[f'Possible Disease ({lang_code})']}")
+            st.write(f"**OTC Medications:** {row[f'OTC Medications ({lang_code})']}")
+            st.write(f"**Advice:** {row[f'Advice ({lang_code})']}")
             st.markdown("---")
     else:
-        st.warning(translations[lang]["no_match"])
+        st.warning("No matching condition found. Try different symptoms.")
 
 st.markdown("---")
-st.markdown(f"*{translations[lang]['disclaimer']}*")
+st.markdown("**Declaration:** This tool provides general guidance based on common symptoms. For emergencies or serious conditions, consult a licensed medical professional.")
 st.markdown("Made with ❤ by SymptomChecker")
