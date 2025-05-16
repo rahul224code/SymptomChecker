@@ -27,8 +27,37 @@ st.title("SymptomChecker")
 st.caption("An AI-powered multilingual tool for safe OTC medicine suggestions")
 
 # Language selector
-lang = st.selectbox("Choose Language", ["English", "Hindi", "Bengali"])
+lang = st.selectbox("Choose Language / भाषा चुनें / ভাষা বেছে নিন", ["English", "Hindi", "Bengali"])
 lang_code = {"English": "English", "Hindi": "Hindi", "Bengali": "Bengali"}[lang]
+
+# UI Text in multiple languages
+ui_text = {
+    "select_symptoms": {
+        "English": "Select symptoms:",
+        "Hindi": "लक्षण चुनें:",
+        "Bengali": "উপসর্গ নির্বাচন করুন:"
+    },
+    "type_symptoms": {
+        "English": "Or type your symptoms (comma-separated):",
+        "Hindi": "या अपने लक्षण टाइप करें (कॉमा से अलग करें):",
+        "Bengali": "অথবা আপনার উপসর্গ টাইপ করুন (কমা দিয়ে আলাদা করে):"
+    },
+    "check_button": {
+        "English": "Check Suggestions",
+        "Hindi": "सुझाव देखें",
+        "Bengali": "সুপারিশ দেখুন"
+    },
+    "no_match": {
+        "English": "No matching condition found. Try different symptoms.",
+        "Hindi": "कोई मेल खाने वाली स्थिति नहीं मिली। कृपया अन्य लक्षण आज़माएं।",
+        "Bengali": "কোনো মেলানো অবস্থা পাওয়া যায়নি। অনুগ্রহ করে ভিন্ন উপসর্গ চেষ্টা করুন।"
+    },
+    "declaration": {
+        "English": "**Declaration:** This tool provides general guidance based on common symptoms. For emergencies or serious conditions, consult a licensed medical professional.",
+        "Hindi": "**घोषणा:** यह टूल सामान्य लक्षणों के आधार पर सामान्य मार्गदर्शन प्रदान करता है। आपात स्थिति या गंभीर बीमारी में कृपया किसी प्रमाणित चिकित्सक से संपर्क करें।",
+        "Bengali": "**ঘোষণা:** এই টুলটি সাধারণ উপসর্গের উপর ভিত্তি করে সাধারণ পরামর্শ প্রদান করে। জরুরি বা গুরুতর অবস্থার জন্য একজন লাইসেন্সপ্রাপ্ত চিকিৎসকের পরামর্শ নিন।"
+    }
+}
 
 # Load data
 data = load_data()
@@ -40,8 +69,8 @@ for symptoms in data[symptom_col]:
     all_symptoms.update([s.strip() for s in symptoms.split(";")])
 
 # Show multiselect options and custom input
-selected_symptoms = st.multiselect(f"Select symptoms ({lang}):", sorted(all_symptoms))
-custom_input = st.text_input("Or type your symptoms (comma-separated):")
+selected_symptoms = st.multiselect(ui_text["select_symptoms"][lang], sorted(all_symptoms))
+custom_input = st.text_input(ui_text["type_symptoms"][lang])
 
 # Merge selections
 final_symptoms = set(selected_symptoms)
@@ -58,7 +87,7 @@ def match_symptoms(user_symptoms, df, lang_code):
     return pd.DataFrame(results)
 
 # Show results
-if st.button("Check Suggestions"):
+if st.button(ui_text["check_button"][lang]):
     result_df = match_symptoms(final_symptoms, data, lang_code)
 
     if not result_df.empty:
@@ -68,8 +97,8 @@ if st.button("Check Suggestions"):
             st.write(f"**Advice:** {row[f'Advice ({lang_code})']}")
             st.markdown("---")
     else:
-        st.warning("No matching condition found. Try different symptoms.")
+        st.warning(ui_text["no_match"][lang])
 
 st.markdown("---")
-st.markdown("**Declaration:** This tool provides general guidance based on common symptoms. For emergencies or serious conditions, consult a licensed medical professional.")
+st.markdown(ui_text["declaration"][lang])
 st.markdown("Made with ❤ by SymptomChecker")
