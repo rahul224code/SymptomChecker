@@ -47,7 +47,7 @@ translations = {
 
 # UI config
 st.set_page_config(page_title="SymptomChecker - AI-Based OTC Suggestion App", page_icon="⚕", layout="centered")
-st.image(logo, width=100)
+st.image(logo, width=120)
 st.title("SymptomChecker")
 st.caption("An AI-powered multilingual tool for safe OTC medicine suggestions")
 
