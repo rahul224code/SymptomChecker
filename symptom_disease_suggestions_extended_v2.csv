@@ -1,0 +1,6 @@
+Symptoms,Possible Disease (English),Possible Disease (Hindi),Possible Disease (Bengali),OTC Medications (English),OTC Medications (Hindi),OTC Medications (Bengali),Advice (English),Advice (Hindi),Advice (Bengali)
+fever;cough;headache,Common Cold,सामान्य जुकाम,সাধারণ সর্দি,"Paracetamol, Cough Syrup","पैरासिटामोल, कफ सिरप","প্যারাসিটামল, কফ সিরাপ",Rest and drink fluids,आराम करें और तरल पदार्थ पीएं,বিশ্রাম নিন এবং জল খান
+fever;cough;shortness of breath,COVID-19,कोविड-19,কোভিড-১৯,"Paracetamol, Vitamin C","पैरासिटामोल, विटामिन सी","প্যারাসিটামল, ভিটামিন সি","Isolate yourself, seek medical help","खुद को अलग रखें, चिकित्सा सहायता लें","নিজেকে আলাদা করুন, চিকিৎসা নিন"
+headache;nausea;dizziness,Migraine,माइग्रेन,মাইগ্রেন,Pain Relievers,दर्द निवारक,ব্যথানাশক,Avoid triggers and rest,ट्रिगर से बचें और आराम करें,ট্রিগার এড়িয়ে চলুন এবং বিশ্রাম নিন
+sneezing;runny nose;itchy eyes,Allergic Rhinitis,एलर्जी राइनाइटिस,অ্যালার্জিক রাইনাইটিস,Antihistamines,एंटीहिस्टामाइन,অ্যান্টিহিস্টামিন,"Avoid allergens, take antihistamines","एलर्जी से बचें, एंटीहिस्टामाइन लें","অ্যালার্জেন এড়িয়ে চলুন, অ্যান্টিহিস্টামিন নিন"
+diarrhea;abdominal pain;dehydration,Food Poisoning,फूड पॉइज़निंग,ফুড পয়জনিং,"ORS, Loperamide","ओआरएस, लोपरामाइड","ওআরএস, লোপেরামাইড",Stay hydrated and rest,हाइड्रेटेड रहें और आराम करें,জল পান করুন এবং বিশ্রাম নিন
