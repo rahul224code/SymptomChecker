@@ -2,26 +2,6 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 from googletrans import Translator
-# Custom CSS for styling
-st.markdown(
-    '''
-    <style>
-        .stApp {
-            background-color: #f9f9f9;
-        }
-        .stTextInput > div > div > input {
-            background-color: #ffffff;
-            color: #000000;
-        }
-        .stButton > button {
-            background-color: #4B8BBE;
-            color: white;
-            font-weight: bold;
-        }
-    </style>
-    ''',
-    unsafe_allow_html=True
-)
 
 # Load logo
 logo = Image.open("logo.png")
@@ -112,7 +92,7 @@ if st.button(ui_text["check_button"][lang]):
 
     if not result_df.empty:
         for _, row in result_df.iterrows():
-            st.success(f"🩺 Possible Disease: {row[f'Possible Disease ({lang_code})']}")
+            st.subheader(f"🩺 Possible Disease: {row[f'Possible Disease ({lang_code})']}")
             st.markdown(f"**💊 OTC Medications:** {row[f'OTC Medications ({lang_code})']}")
             st.markdown(f"**📋 Advice:** {row[f'Advice ({lang_code})']}")
 
