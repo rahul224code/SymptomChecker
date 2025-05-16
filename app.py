@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from PIL import Image
-from googletrans import Translator
 import os
 
 # Load logo if exists
@@ -10,52 +9,40 @@ if os.path.exists("logo.png"):
 else:
     logo = None
 
-# Load dataset
+# Load data
 @st.cache_data
 def load_data():
     return pd.read_csv("symptom_disease_suggestions.csv")
 
-# Function to match symptoms
 def match_symptoms(user_symptoms, data):
     user_symptom_list = [s.strip().lower() for s in user_symptoms if s.strip()]
     results = []
     for _, row in data.iterrows():
         known_symptoms = [s.strip().lower() for s in row["Symptoms"].split(";")]
-        # Check if any user symptom is in known symptoms
         if any(symptom in known_symptoms for symptom in user_symptom_list):
             results.append(row)
     return pd.DataFrame(results)
 
-# Setup translator
-translator = Translator()
-
-def translate(text, dest):
-    try:
-        return translator.translate(text, dest=dest).text
-    except:
-        return text
-
-# Page config and header
+# UI config
 st.set_page_config(page_title="SymptomChecker - AI-Based OTC Suggestion App", page_icon="⚕", layout="centered")
+
 if logo:
     st.image(logo, width=100)
 st.title("SymptomChecker")
 st.caption("An AI-powered multilingual tool for safe OTC medicine suggestions")
 
-# Load data
 data = load_data()
 
-# Extract all unique symptoms from dataset for multiselect
+# Extract all unique symptoms for multiselect
 all_symptoms = set()
 for s in data["Symptoms"]:
-    parts = [sym.strip() for sym in s.split(";")]
-    all_symptoms.update(parts)
+    all_symptoms.update([sym.strip() for sym in s.split(";")])
 all_symptoms = sorted(all_symptoms)
 
 # Language selection
-lang = st.selectbox("Choose Language", ["English", "Hindi", "Bengali"])
+lang = st.selectbox("Choose Language / भाषा चुनें / ভাষা নির্বাচন করুন", ["English", "Hindi", "Bengali"])
 
-# Translations dictionary
+# Translation dictionary
 translations = {
     "English": {
         "select_symptoms": "Select your symptoms (multiple):",
@@ -64,7 +51,7 @@ translations = {
         "possible_disease": "Possible Disease:",
         "medications": "OTC Medications:",
         "advice": "Advice:",
-        "no_match": "No matching condition found. Please try again with different symptoms."
+        "no_match": "No matching condition found. Please try different symptoms."
     },
     "Hindi": {
         "select_symptoms": "अपने लक्षण चुनें (एक से अधिक):",
@@ -73,7 +60,7 @@ translations = {
         "possible_disease": "संभावित बीमारी:",
         "medications": "ओटीसी दवाएं:",
         "advice": "सलाह:",
-        "no_match": "कोई मेल नहीं मिला। कृपया अलग लक्षणों के साथ पुनः प्रयास करें।"
+        "no_match": "कोई मेल नहीं मिला। कृपया अलग लक्षणों से पुनः प्रयास करें।"
     },
     "Bengali": {
         "select_symptoms": "আপনার উপসর্গ নির্বাচন করুন (একাধিক):",
@@ -86,22 +73,26 @@ translations = {
     }
 }
 
-# User input: multiselect and text input
+# Inputs
 selected_symptoms = st.multiselect(translations[lang]["select_symptoms"], all_symptoms)
 typed_symptoms = st.text_input(translations[lang]["or_type"])
 
-# Combine symptoms list
+# Combine symptoms
 typed_symptoms_list = [s.strip() for s in typed_symptoms.split(",") if s.strip()]
-combined_symptoms = list(set(selected_symptoms + typed_symptoms_list))  # Remove duplicates
+combined_symptoms = list(set(selected_symptoms + typed_symptoms_list))  # remove duplicates
 
 if st.button(translations[lang]["check"]):
     if combined_symptoms:
-        result_df = match_symptoms(combined_symptoms, data)
-        if not result_df.empty:
-            for i, row in result_df.iterrows():
-                st.subheader(f"{translations[lang]['possible_disease']} {translate(row['Possible Disease'], lang[:2])}")
-                st.write(f"**{translations[lang]['medications']}** {translate(row['OTC Medications'], lang[:2])}")
-                st.write(f"**{translations[lang]['advice']}** {translate(row['Advice'], lang[:2])}")
+        results = match_symptoms(combined_symptoms, data)
+        if not results.empty:
+            for _, row in results.iterrows():
+                disease_col = f"Possible Disease ({lang})"
+                med_col = f"OTC Medications ({lang})"
+                advice_col = f"Advice ({lang})"
+                
+                st.subheader(f"{translations[lang]['possible_disease']} {row[disease_col]}")
+                st.write(f"**{translations[lang]['medications']}** {row[med_col]}")
+                st.write(f"**{translations[lang]['advice']}** {row[advice_col]}")
                 st.markdown("---")
         else:
             st.warning(translations[lang]["no_match"])
