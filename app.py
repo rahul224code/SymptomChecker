@@ -2,6 +2,26 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 from googletrans import Translator
+# Custom CSS for styling
+st.markdown(
+    '''
+    <style>
+        .stApp {
+            background-color: #f9f9f9;
+        }
+        .stTextInput > div > div > input {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .stButton > button {
+            background-color: #4B8BBE;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+    ''',
+    unsafe_allow_html=True
+)
 
 # Load logo
 logo = Image.open("logo.png")
@@ -23,7 +43,7 @@ def translate(text, dest):
 # UI config
 st.set_page_config(page_title="SymptomChecker - AI-Based OTC Suggestion App", page_icon="⚕", layout="centered")
 st.image(logo, width=150)
-st.markdown("<h2>SymptomChecker</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: #4B8BBE; font-weight: bold;'>SymptomChecker</h2>", unsafe_allow_html=True)
 st.caption("An AI-powered multilingual tool for safe OTC medicine suggestions")
 
 # Language selector
@@ -92,10 +112,10 @@ if st.button(ui_text["check_button"][lang]):
 
     if not result_df.empty:
         for _, row in result_df.iterrows():
-            st.subheader(f"Possible Disease: {row[f'Possible Disease ({lang_code})']}")
-            st.write(f"**OTC Medications:** {row[f'OTC Medications ({lang_code})']}")
-            st.write(f"**Advice:** {row[f'Advice ({lang_code})']}")
-            st.markdown("---")
+            st.success(f"🩺 Possible Disease: {row[f'Possible Disease ({lang_code})']}")
+            st.markdown(f"**💊 OTC Medications:** {row[f'OTC Medications ({lang_code})']}")
+            st.markdown(f"**📋 Advice:** {row[f'Advice ({lang_code})']}")
+
     else:
         st.warning(ui_text["no_match"][lang])
 
