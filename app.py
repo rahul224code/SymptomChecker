@@ -20,7 +20,8 @@ translations = {
         "possible_disease": "Possible Disease:",
         "medications": "OTC Medications:",
         "advice": "Advice:",
-        "no_match": "No matching condition found. Please try again with different symptoms."
+        "no_match": "No matching condition found. Please try again with different symptoms.",
+        "disclaimer": "Disclaimer: This tool is for informational purposes only and not a substitute for professional medical advice. Always consult a licensed healthcare provider."
     },
     "Hindi": {
         "enter_symptoms": "अपने लक्षण दर्ज करें (कॉमा से अलग करें या नीचे से चुनें):",
@@ -29,7 +30,8 @@ translations = {
         "possible_disease": "संभावित बीमारी:",
         "medications": "ओटीसी दवाएं:",
         "advice": "सलाह:",
-        "no_match": "कोई मेल नहीं मिला। कृपया अलग लक्षणों के साथ पुनः प्रयास करें।"
+        "no_match": "कोई मेल नहीं मिला। कृपया अलग लक्षणों के साथ पुनः प्रयास करें।",
+        "disclaimer": "अस्वीकरण: यह उपकरण केवल सूचना के उद्देश्य से है और पेशेवर चिकित्सा सलाह का विकल्प नहीं है। हमेशा एक लाइसेंस प्राप्त स्वास्थ्य प्रदाता से परामर्श लें।"
     },
     "Bengali": {
         "enter_symptoms": "আপনার উপসর্গ লিখুন (কমা দিয়ে আলাদা করুন বা নিচে থেকে বেছে নিন):",
@@ -38,7 +40,8 @@ translations = {
         "possible_disease": "সম্ভাব্য রোগ:",
         "medications": "ওটিসি ওষুধ:",
         "advice": "পরামর্শ:",
-        "no_match": "মিল পাওয়া যায়নি। দয়া করে অন্য উপসর্গ দিয়ে চেষ্টা করুন।"
+        "no_match": "মিল পাওয়া যায়নি। দয়া করে অন্য উপসর্গ দিয়ে চেষ্টা করুন।",
+        "disclaimer": "দায়ত্যাগ: এই টুলটি শুধুমাত্র তথ্যের উদ্দেশ্যে এবং পেশাদার চিকিৎসা পরামর্শের বিকল্প নয়। সর্বদা একজন লাইসেন্সপ্রাপ্ত স্বাস্থ্যসেবা প্রদানকারীর পরামর্শ নিন।"
     }
 }
 
@@ -97,4 +100,5 @@ if st.button(translations[lang]["check"]):
         st.warning(translations[lang]["no_match"])
 
 st.markdown("---")
+st.markdown(f"*{translations[lang]['disclaimer']}*")
 st.markdown("Made with ❤ by SymptomChecker")
